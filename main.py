@@ -16,14 +16,15 @@ from Tweet import Tweet
 import streamlit as st
 from plotly import graph_objs as go
 
-
-def check_stock_symbol(flag=False, companies_file='companylist.csv'):
-    df = pd.read_csv(companies_file, usecols=[0])
+def check_stock_symbol(flag=False, companies_file='new.csv'):
+    df = pd.read_csv(companies_file, usecols=[0,1])
+    print(df)
     while flag is False:
         for index in range(len(df)):
-            if df['Symbol'][index] == symbol:
+            if df['Name'][index] == symbol:
                 flag = True
-    return flag, symbol
+                symbols= df['Symbol'][index]
+    return flag, symbols
 
 # @st.cache
 def get_stock_data(symbol, from_date, to_date):
@@ -128,16 +129,18 @@ def recommending(df, forecast_out, global_polarity):
 if __name__ == "__main__":
     # Start 
     st.title("Stock prediction App")
-    d = pd.read_csv('companylist.csv', usecols=[0])
+    d = pd.read_csv('new.csv', usecols=[0, 1])
+
+    # print(d)
 
     # Get stock list
     stocks = []
     for index in range(len(d)):
-            stocks.append(d['Symbol'][index])
+            stocks.append(d['Name'][index])
 
     symbol = st.selectbox("Select dataset for prediction", stocks)
     style.use('ggplot')
-    (flag, symbol) = check_stock_symbol(False, 'companylist.csv')
+    (flag, symbol) = check_stock_symbol(False, 'new.csv')
     if flag:
         actual_date = dt.date.today()
         past_date = actual_date - dt.timedelta(days=365 * 3)
@@ -155,5 +158,3 @@ if __name__ == "__main__":
         recommending(dataframe, forecast_out, polarity)
     else:
         st.text("Please enter correct name")
-
-
